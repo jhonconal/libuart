@@ -1,0 +1,245 @@
+#include <stdio.h>
+#include "accesstermios.h"
+
+void show_termios(const struct termios *s)
+{
+	if( s )
+	{
+		printf("speed=%d\n", get_speed(s));
+		printf("parity=%c\n", get_parity(s));
+		printf("bsize=%d\n", get_bsize(s));
+		printf("stop=%d\n", get_stop(s));
+	}
+}
+int get_termios(int fd, struct termios *s)
+{
+	if( -1 == fd || 0 == s )
+	{
+		return -1;
+	}
+	return tcgetattr(fd, s);
+}
+int set_termios(int fd, const struct termios *s)
+{
+	if( -1 == fd || 0 == s )
+	{
+		return -1;
+	}
+	return tcsetattr(fd, TCSANOW, s);
+}
+
+int baud_to_speed(int baud)
+{
+	switch( baud )
+	{
+		case B1200:
+			return 1200;
+		case B2400:
+			return 2400;
+		case B4800:
+			return 4800;
+		case B9600:
+			return 9600;
+		case B19200:
+			return 19200;
+		case B38400:
+			return 38400;
+		case B57600:
+			return 57600;
+		case B115200:
+			return 115200;
+	}
+	return 0;
+}
+
+int get_speed(const struct termios *s)
+{
+	if( s )
+	{
+		return baud_to_speed(s->c_cflag & CBAUD);
+	}
+	return 0;
+}
+int get_ispeed(const struct termios *s)
+{
+	if( s )
+	{
+		return baud_to_speed(s->c_iflag & CBAUD);
+	}
+	return 0;
+}
+int get_ospeed(const struct termios *s)
+{
+	if( s )
+	{
+		return baud_to_speed(s->c_oflag & CBAUD);
+	}
+	return 0;
+}
+int get_bsize(const struct termios *s)
+{
+	if( s )
+	{
+		switch(s->c_cflag & CSIZE)
+		{
+			case CS5:
+				return 5;
+			case CS6:
+				return 6;
+			case CS7:
+				return 7;
+			case CS8:
+				return 8;
+		}
+	}
+	return 0;
+}
+char get_parity(const struct termios *s)
+{
+	if( s )
+	{
+		if( s->c_cflag & PARENB )
+		{
+			if( s->c_cflag & PARODD )
+			{
+				return 'O';
+			}
+			else
+			{
+				return 'E';
+			}
+		}
+		return 'N';
+	}
+	return 0;
+}
+int get_stop(const struct termios *s)
+{
+	if( s )
+	{
+		if( s->c_cflag & CSTOPB )
+		{
+			return 2;
+		}
+		return 1;
+	}
+	return 0;
+}
+
+int speed_to_baud(int speed)
+{
+	switch(speed)
+	{
+		case 1200:
+			return B1200;
+		case 2400:
+			return B2400;
+		case 4800:
+			return B4800;
+		case 9600:
+			return B9600;
+		case 19200:
+			return B19200;
+		case 38400:
+			return B38400;
+		case 57600:
+			return B57600;
+		case 115200:
+			return B115200;
+	}
+	return B9600;
+}
+
+int set_speed(struct termios *s, int speed)
+{
+	if( s )
+	{
+		s->c_cflag &= ~CBAUD;
+		s->c_cflag |= speed_to_baud(speed);
+		return 0;
+	}
+	return -1;
+}
+int set_ispeed(struct termios *s, int speed)
+{
+	if( s )
+	{
+		return cfsetispeed(s, speed_to_baud(speed) );
+	}
+	return -1;
+}
+int set_ospeed(struct termios *s, int speed)
+{
+	if( s )
+	{
+		return cfsetospeed(s, speed_to_baud(speed) );
+	}
+	return -1;
+}
+int set_bsize(struct termios *s, int bsize)
+{
+	if( s )
+	{
+		s->c_cflag &= ~CSIZE;
+		switch( bsize )
+		{
+			case 5:
+				s->c_cflag |= CS5;
+				break;
+			case 6:
+				s->c_cflag |= CS6;
+				break;
+			case 7:
+				s->c_cflag |= CS7;
+				break;
+			case 8:
+				s->c_cflag |= CS8;
+				break;
+		}
+		return 0;
+	}
+	return -1;
+}
+int set_parity(struct termios *s, char parity)
+{
+	if( s )
+	{
+		switch(parity)
+		{
+			case 'n':
+			case 'N':
+				s->c_cflag &= ~PARENB;
+				break;
+			case 'o':
+			case 'O':
+				s->c_cflag |= PARENB;
+				s->c_cflag |= PARODD;
+				break;
+			case 'e':
+			case 'E':
+				s->c_cflag |= PARENB;
+				s->c_cflag &= ~PARODD;
+				break;
+		}
+		return 0;
+	}
+	return -1;
+}
+int set_stop(struct termios *s, int stop)
+{
+	if( s )
+	{
+		if( 1 == stop )
+		{
+			s->c_cflag &= ~CSTOPB;
+		}
+		else
+		{
+			s->c_cflag |= CSTOPB;
+		}
+		return 0;
+	}
+	return -1;
+}
+
+
