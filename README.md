@@ -31,6 +31,7 @@ int main(void)
   {
       printf("串口打开失败！\n");
   }
+  uart_config(fd, 115200, 'N', 8, 1);
   uart_write(fd, "data to send", 12);
   uart_close(fd);
   
