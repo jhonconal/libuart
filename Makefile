@@ -1,5 +1,11 @@
+CC := gcc
+CC := arm-linux-gcc
+
 uarttest: *.c
-	arm-linux-gcc *.c -o $@
+	$(CC) *.c -o $@
+
+copy:
+	cp uarttest /srv/tftp/
 
 clean:
 	@rm -vf uarttest

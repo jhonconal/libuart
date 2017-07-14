@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 		{
 			printf("buf:%s\n", buf);
 			usleep(100000);
-			uart_write(fd, file, strlen(file));
+			//uart_write(fd, file, strlen(file));
 		}
 		usleep(1000);
 		//uart_write(fd, file, strlen(file));

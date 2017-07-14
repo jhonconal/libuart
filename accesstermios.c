@@ -58,7 +58,7 @@ int get_speed(const struct termios *s)
 	{
 		return baud_to_speed(s->c_cflag & CBAUD);
 	}
-	return 0;
+	return -1;
 }
 int get_ispeed(const struct termios *s)
 {
@@ -66,7 +66,7 @@ int get_ispeed(const struct termios *s)
 	{
 		return baud_to_speed(s->c_iflag & CBAUD);
 	}
-	return 0;
+	return -1;
 }
 int get_ospeed(const struct termios *s)
 {
@@ -92,7 +92,7 @@ int get_bsize(const struct termios *s)
 				return 8;
 		}
 	}
-	return 0;
+	return -1;
 }
 char get_parity(const struct termios *s)
 {
@@ -111,7 +111,7 @@ char get_parity(const struct termios *s)
 		}
 		return 'N';
 	}
-	return 0;
+	return -1;
 }
 int get_stop(const struct termios *s)
 {
@@ -123,7 +123,7 @@ int get_stop(const struct termios *s)
 		}
 		return 1;
 	}
-	return 0;
+	return -1;
 }
 
 int speed_to_baud(int speed)
@@ -241,5 +241,39 @@ int set_stop(struct termios *s, int stop)
 	}
 	return -1;
 }
-
-
+int enable_read(struct termios *s)
+{
+	if( s )
+	{
+		s->c_cflag |= CREAD;
+		return 0;
+	}
+	return -1;
+}
+int disable_read(struct termios *s)
+{
+	if( s )
+	{
+		s->c_cflag &= ~CREAD;
+		return 0;
+	}
+	return -1;
+}
+int enable_flow_control(struct termios *s)
+{
+	if( s )
+	{
+		s->c_cflag |= CRTSCTS;
+		return 0;
+	}
+	return -1;
+}
+int disable_flow_control(struct termios *s)
+{
+	if( s )
+	{
+		s->c_cflag &= ~CRTSCTS;
+		return 0;
+	}
+	return -1;
+}

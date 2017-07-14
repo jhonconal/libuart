@@ -36,6 +36,8 @@ int uart_config(int fd, int baud, char parity, int bsize, int stop)
 		{
 			return -5;
 		}
+		enable_read(&new);
+		disable_flow_control(&new);
 		if( set_termios(fd, &new) )
 		{
 			return -6;
